@@ -11,7 +11,12 @@ $connection = (new SSHConnection())
     ->withPassword('password')
     ->connect();
 
-$output = $connection->run('ls -lah');
+$outputs = $connection->run([
+    'ls -lah',
+    'echo "Hello world!"',
+]);
 
-var_dump($output->getOutput());
-var_dump($output->getError());
+foreach($outputs as $output) {
+    var_dump($output->getOutput());
+    var_dump($output->getError());
+}
