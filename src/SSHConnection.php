@@ -96,30 +96,12 @@ class SSHConnection
         ssh2_disconnect($this->resource);
     }
 
-    public function run($commands)
+    public function run(string $command)
     {
-        if (is_string($commands)) {
-            $commands = [$commands];
-        }
-
-        if (!is_array($commands)) {
-            throw new InvalidArgumentException('Command(s) passed should be a string or an array of string.');
-        }
-
         if (!$this->connected) {
             throw new RuntimeException('Unable to run commands when not connected.');
         }
 
-        $results = [];
-
-        foreach($commands as $command) {
-            $results[] = new SSHCommand($this->resource, $command);
-        }
-
-        if (count($results) === 1) {
-            return $results[0];
-        }
-
-        return $results;
+        return new SSHCommand($this->resource, $command);
     }
 }
