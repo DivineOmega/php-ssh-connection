@@ -102,7 +102,7 @@ class SSHConnection
         }
 
         if (!is_array($commands)) {
-            throw new \InvalidArgumentException('Command(s) passed should be a string or array.');
+            throw new \InvalidArgumentException('Command(s) passed should be a string or an array of string.');
         }
 
         if (!$this->connected) {
