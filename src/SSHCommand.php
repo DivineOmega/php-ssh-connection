@@ -2,58 +2,64 @@
 
 namespace DivineOmega\SSHConnection;
 
+use RuntimeException;
+
 class SSHCommand
 {
-    public $output = null;
-    public $error = null;
+    const EXECUTION_TIMEOUT_SECONDS = 30;
+    const STREAM_BYTES_PER_READ = 4096;
+
+    private $resource;
+    private $command;
+    private $output;
+    private $error;
 
     public function __construct($resource, string $command)
     {
-        $stdout = ssh2_exec($resource, $command);
+        $this->resource = $resource;
+        $this->command = $command;
+
+        $this->execute();
+    }
+
+    private function execute()
+    {
+        $stdout = ssh2_exec($this->resource, $this->command);
+
+        if (!$stdout) {
+            throw new RuntimeException('Failed to execute command (no stdout stream): '.$this->command);
+        }
+
         $stderr = ssh2_fetch_stream($stdout, SSH2_STREAM_STDERR);
 
-        if (empty($stdout)) {
-            throw new \RuntimeException('Failed to execute command: '.$command);
+        if (!$stderr) {
+            throw new RuntimeException('Failed to execute command (no stdout stream): '.$this->command);
         }
 
         $startTime = time();
 
-        // Try for 30s
         do {
-            $this->error = fread($stderr, 4096);
-            $this->output = fread($stdout, 4096);
-            $done = 0;
+            $this->error = fread($stderr, self::STREAM_BYTES_PER_READ);
+            $this->output = fread($stdout, self::STREAM_BYTES_PER_READ);
 
-            if (feof($stderr)) {
-                $done++;
-            }
+            $streamsComplete = (feof($stderr) && feof($stdout));
 
-            if (feof($stdout)) {
-                $done++;
-            }
-
-            $span = time() - $startTime;
-
-            if ($done < 2) {
+            if (!$streamsComplete) {
+                // Prevent thrashing.
                 sleep(1);
             }
 
-        } while (($span < 30) && ($done < 2));
+            $executionDuration = time() - $startTime;
 
+        } while ($executionDuration <= self::EXECUTION_TIMEOUT_SECONDS && !$streamsComplete);
     }
 
-    /**
-     * @return bool|string|null
-     */
-    public function getOutput()
+    public function getOutput(): string
     {
         return $this->output;
     }
 
-    /**
-     * @return bool|string|null
-     */
-    public function getError()
+    public function getError(): string
     {
         return $this->error;
     }
