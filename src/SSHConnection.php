@@ -4,6 +4,9 @@
 namespace DivineOmega\SSHConnection;
 
 
+use InvalidArgumentException;
+use RuntimeException;
+
 class SSHConnection
 {
     private $hostname;
@@ -49,15 +52,15 @@ class SSHConnection
     private function sanityCheck()
     {
         if (!$this->hostname) {
-            throw new \InvalidArgumentException('Hostname not specified.');
+            throw new InvalidArgumentException('Hostname not specified.');
         }
 
         if (!$this->username) {
-            throw new \InvalidArgumentException('Username not specified.');
+            throw new InvalidArgumentException('Username not specified.');
         }
 
         if (!$this->password && (!$this->publicKeyPath || !$this->privateKeyPath)) {
-            throw new \InvalidArgumentException('No password or public-private key pair specified.');
+            throw new InvalidArgumentException('No password or public-private key pair specified.');
         }
     }
 
@@ -70,14 +73,14 @@ class SSHConnection
         if ($this->publicKeyPath || $this->privateKeyPath) {
             $authenticated = ssh2_auth_pubkey_file($this->resource, $this->username, $this->publicKeyPath, $this->privateKeyPath);
             if (!$authenticated) {
-                throw new \RuntimeException('Error authenticating with public-private key pair.');
+                throw new RuntimeException('Error authenticating with public-private key pair.');
             }
         }
 
         if ($this->password) {
             $authenticated = ssh2_auth_password($this->resource, $this->username, $this->password);
             if (!$authenticated) {
-                throw new \RuntimeException('Error authenticating with password.');
+                throw new RuntimeException('Error authenticating with password.');
             }
         }
 
@@ -89,7 +92,7 @@ class SSHConnection
     public function disconnect()
     {
         if (!$this->connected) {
-            throw new \RuntimeException('Unable to disconnect. Not yet connected.');
+            throw new RuntimeException('Unable to disconnect. Not yet connected.');
         }
 
         ssh2_disconnect($this->resource);
@@ -102,11 +105,11 @@ class SSHConnection
         }
 
         if (!is_array($commands)) {
-            throw new \InvalidArgumentException('Command(s) passed should be a string or an array of string.');
+            throw new InvalidArgumentException('Command(s) passed should be a string or an array of string.');
         }
 
         if (!$this->connected) {
-            throw new \RuntimeException('Unable to run commands when not connected.');
+            throw new RuntimeException('Unable to run commands when not connected.');
         }
 
         $results = [];
