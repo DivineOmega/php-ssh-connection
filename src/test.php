@@ -11,7 +11,7 @@ $connection = (new SSHConnection())
     ->withPassword('password')
     ->connect();
 
-$output = $connection->run('ls -lah');
+$command = $connection->run('ls -lah');
 
-var_dump($output->getOutput());
-var_dump($output->getError());
+var_dump($command->getOutput());
+var_dump($command->getError());
