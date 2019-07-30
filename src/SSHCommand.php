@@ -43,20 +43,23 @@ class SSHCommand
     {
         $startTime = time();
 
-        do {
+        while (true) {
             $this->output = fread($stdout, self::STREAM_BYTES_PER_READ);
             $this->error = fread($stderr, self::STREAM_BYTES_PER_READ);
 
-            $streamsComplete = (feof($stdout) && feof($stderr));
-
-            if (!$streamsComplete) {
-                // Prevent thrashing.
-                sleep(1);
+            if (feof($stdout) && feof($stderr)) {
+                break;
             }
 
-            $executionDuration = time() - $startTime;
+            if (time() - $startTime > self::EXECUTION_TIMEOUT_SECONDS) {
+                throw new RuntimeException(
+                    'Command execution took over '.self::EXECUTION_TIMEOUT_SECONDS.' seconds: '.$this->command
+                );
+            }
 
-        } while ($executionDuration <= self::EXECUTION_TIMEOUT_SECONDS && !$streamsComplete);
+            // Prevent thrashing
+            sleep(1);
+        }
     }
 
     public function getRawOutput(): string
