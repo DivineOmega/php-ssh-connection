@@ -13,6 +13,7 @@ class SSHConnection
     private $publicKeyPath;
     private $privateKeyPath;
     private $connected;
+    private $resource;
 
     public function to(string $hostname): self
     {
@@ -45,12 +46,53 @@ class SSHConnection
         return $this;
     }
 
-    public function connect()
+    private function sanityCheck()
     {
-        // TODO: Sanity check required variables.
-        // TODO: Make SSH connection.
+        if (!$this->hostname) {
+            throw new \InvalidArgumentException('Hostname not specified.');
+        }
+
+        if (!$this->username) {
+            throw new \InvalidArgumentException('Username not specified.');
+        }
+
+        if (!$this->password && (!$this->publicKeyPath || !$this->privateKeyPath)) {
+            throw new \InvalidArgumentException('No password or public-private key pair specified.');
+        }
+    }
+
+    public function connect(): self
+    {
+        $this->sanityCheck();
+
+        $this->resource = ssh2_connect($this->hostname, $this->port);
+
+        if ($this->publicKeyPath || $this->privateKeyPath) {
+            $authenticated = ssh2_auth_pubkey_file($this->resource, $this->username, $this->publicKeyPath, $this->privateKeyPath);
+            if (!$authenticated) {
+                throw new \RuntimeException('Error authenticating with public-private key pair.');
+            }
+        }
+
+        if ($this->password) {
+            $authenticated = ssh2_auth_password($this->resource, $this->username, $this->password);
+            if (!$authenticated) {
+                throw new \RuntimeException('Error authenticating with password.');
+            }
+        }
 
         $this->connected = true;
+
+        return $this;
+    }
+
+    public function disconnect()
+    {
+        if (!$this->connected) {
+            throw new \RuntimeException('Unable to disconnect. Not yet connected.');
+        }
+
+        ssh2_disconnect($this->resource);
     }
 
     public function run($commands)
@@ -67,6 +109,16 @@ class SSHConnection
             throw new \RuntimeException('Unable to run commands when not connected.');
         }
 
-        // TODO: Execute commands
+        $results = [];
+
+        foreach($commands as $command) {
+            $results[] = new SSHCommand($this->resource, $command);
+        }
+
+        if (count($results) === 1) {
+            return $results[0];
+        }
+
+        return $results;
     }
 }
