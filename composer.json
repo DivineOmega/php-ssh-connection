@@ -9,7 +9,9 @@
             "email": "jordan@hall05.co.uk"
         }
     ],
-    "require": {},
+    "require": {
+        "ext-ssh2": "*"
+    },
     "autoload": {
         "psr-4": {
             "DivineOmega\\SSHConnection\\": "src/"
