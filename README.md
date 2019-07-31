@@ -14,6 +14,7 @@ $connection = (new SSHConnection())
             ->onPort(22)
             ->as('demo')
             ->withPassword('password')
+         // ->withKeyPair($publicKeyPath, $privateKeyPath)
             ->connect();
 
 $command = $connection->run('echo "Hello world!"');
