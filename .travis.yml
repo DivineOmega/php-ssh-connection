@@ -1,12 +1,16 @@
 language: php
 dist: xenial
-before_install:
-  - sudo apt-get install -y -qq libssh2-1-dev libssh2-php
-  - pecl install -f ssh2-beta < .noninteractive
 php:
   - '7.1'
   - '7.2'
   - '7.3'
+matrix:
+  include:
+    - php: '7.1'
+      addons:
+        apt:
+          packages:
+            - php7.1-ssh2
 install:
   - composer update
 script:
