@@ -1,7 +1,7 @@
 language: php
 dist: xenial
 before_install:
-  - pecl install ssh2
+  - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 php:
   - '7.1'
   - '7.2'
