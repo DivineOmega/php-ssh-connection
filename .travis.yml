@@ -3,10 +3,11 @@ dist: xenial
 matrix:
   include:
     - php: '7.1'
-      addons:
-        apt:
-          packages:
-            - php-ssh2
+      before_install:
+        - sudo apt-get install software-properties-common
+        - sudo add-apt-repository ppa:ondrej/php
+        - sudo apt-get update
+        - sudo apt-get install -y php7.1-ssh2
 install:
   - composer update
 script:
