@@ -1,7 +1,8 @@
 language: php
 dist: xenial
 before_install:
-  - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - sudo apt-get install -y -qq libssh2-1-dev libssh2-php
+  - pecl install -f ssh2-beta < .noninteractive
 php:
   - '7.1'
   - '7.2'
