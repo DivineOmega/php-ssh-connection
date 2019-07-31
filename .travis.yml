@@ -1,7 +1,8 @@
 language: php
 dist: xenial
-apt_packages:
-  - php-ssh2
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y php-ssh2
 php:
   - '7.1'
   - '7.2'
