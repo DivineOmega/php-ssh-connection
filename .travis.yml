@@ -1,0 +1,17 @@
+language: php
+
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+
+before_script:
+  - sudo apt-get update && sudo apt-get install libssh2-1 libssh2-1-dev -y
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]]; then cd /tmp && git clone https://git.php.net/repository/pecl/networking/ssh2.git && cd /tmp/ssh2 && phpize && ./configure && make && make install; fi
+  - echo "extension=ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - cd $TRAVIS_BUILD_DIR
+  - ssh-keygen -N '' -f ~/.ssh/id_rsa
+  - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+  - composer install
+
+script: ./vendor/bin/phpunit
