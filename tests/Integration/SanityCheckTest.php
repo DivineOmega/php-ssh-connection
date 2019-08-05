@@ -3,7 +3,7 @@
 use DivineOmega\SSHConnection\SSHConnection;
 use PHPUnit\Framework\TestCase;
 
-final class SSHConnectionTest extends TestCase
+final class SanityCheckTest extends TestCase
 {
     public function testNoHostname()
     {
