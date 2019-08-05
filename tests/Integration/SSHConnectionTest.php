@@ -5,13 +5,31 @@ use PHPUnit\Framework\TestCase;
 
 final class SSHConnectionTest extends TestCase
 {
-    public function testSSHConnection()
+    public function testSSHConnectionWithKeyPair()
     {
         $connection = (new SSHConnection())
             ->to('localhost')
             ->onPort(22)
             ->as('travis')
             ->withKeyPair('/home/travis/.ssh/id_rsa.pub', '/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $command = $connection->run('echo "Hello world!"');
+
+        $this->assertEquals('Hello world!', $command->getOutput());
+        $this->assertEquals('Hello world!'."\n", $command->getRawOutput());
+
+        $this->assertEquals('', $command->getError());
+        $this->assertEquals('', $command->getRawError());
+    }
+
+    public function testSSHConnectionWithPassword()
+    {
+        $connection = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPassword('test.rebex.net')
             ->connect();
 
         $command = $connection->run('echo "Hello world!"');
