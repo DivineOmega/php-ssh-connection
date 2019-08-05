@@ -26,10 +26,10 @@ final class SSHConnectionTest extends TestCase
     public function testSSHConnectionWithPassword()
     {
         $connection = (new SSHConnection())
-            ->to('localhost')
+            ->to('test.rebex.net')
             ->onPort(22)
-            ->as('travis')
-            ->withPassword('test.rebex.net')
+            ->as('demo')
+            ->withPassword('password')
             ->connect();
 
         $command = $connection->run('echo "Hello world!"');
