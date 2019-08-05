@@ -62,6 +62,28 @@ class SSHConnection
         }
     }
 
+    public function upload(string $localPath, string $remotePath): bool
+    {
+        if (!is_resource($this->resource)) {
+            throw new InvalidArgumentException('The session resource is invalid.');
+        }
+
+        if (!file_exists($localPath)) {
+            throw new InvalidArgumentException('The localPath is invalid.');
+        }
+
+        return ssh2_scp_send($this->resource, $localPath, $remotePath);
+    }
+
+    public function download(string $remotePath, string $localPath): bool
+    {
+        if (!is_resource($this->resource)) {
+            throw new InvalidArgumentException('The session resource is invalid.');
+        }
+
+        return ssh2_scp_recv($this->resource, $remotePath, $localPath);
+    }
+
     public function connect(): self
     {
         $this->sanityCheck();
