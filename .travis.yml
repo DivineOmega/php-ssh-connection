@@ -14,4 +14,8 @@ before_script:
   - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
   - composer install
 
-script: ./vendor/bin/phpunit
+script:
+  - ./vendor/bin/phpunit --coverage-clover ./tests/Logs/clover.xml
+
+after_script:
+  - php vendor/bin/php-coveralls -v
