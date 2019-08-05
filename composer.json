@@ -1,6 +1,6 @@
 {
     "name": "divineomega/php-ssh-connection",
-    "description": "PHP SSH Connection",
+    "description": "Provides an elegant syntax to connect to SSH servers and execute commands.",
     "type": "library",
     "license": "LGPL-3.0-only",
     "authors": [
