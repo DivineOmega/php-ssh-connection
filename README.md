@@ -38,5 +38,5 @@ $command->getOutput();  // 'Hello World'
 $command->getError();   // ''
 
 $connection->upload($localPath, $remotePath);
-$connection->download($remotPath, $localPath);
+$connection->download($remotePath, $localPath);
 ```
