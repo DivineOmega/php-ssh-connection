@@ -23,7 +23,7 @@ composer require divineomega/php-ssh-connection
 
 ## Usage
 
-````php
+```php
 $connection = (new SSHConnection())
             ->to('test.rebex.net')
             ->onPort(22)
