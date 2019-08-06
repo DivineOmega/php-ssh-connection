@@ -62,28 +62,6 @@ class SSHConnection
         }
     }
 
-    public function upload(string $localPath, string $remotePath): bool
-    {
-        if (!is_resource($this->resource)) {
-            throw new InvalidArgumentException('The session resource is invalid.');
-        }
-
-        if (!file_exists($localPath)) {
-            throw new InvalidArgumentException('The localPath is invalid.');
-        }
-
-        return ssh2_scp_send($this->resource, $localPath, $remotePath);
-    }
-
-    public function download(string $remotePath, string $localPath): bool
-    {
-        if (!is_resource($this->resource)) {
-            throw new InvalidArgumentException('The session resource is invalid.');
-        }
-
-        return ssh2_scp_recv($this->resource, $remotePath, $localPath);
-    }
-
     public function connect(): self
     {
         $this->sanityCheck();
@@ -109,7 +87,7 @@ class SSHConnection
         return $this;
     }
 
-    public function disconnect()
+    public function disconnect(): void
     {
         if (!$this->connected) {
             throw new RuntimeException('Unable to disconnect. Not yet connected.');
@@ -118,12 +96,34 @@ class SSHConnection
         ssh2_disconnect($this->resource);
     }
 
-    public function run(string $command)
+    public function run(string $command): SSHCommand
     {
         if (!$this->connected) {
             throw new RuntimeException('Unable to run commands when not connected.');
         }
 
         return new SSHCommand($this->resource, $command);
+    }
+
+    public function upload(string $localPath, string $remotePath): bool
+    {
+        if (!$this->connected) {
+            throw new RuntimeException('Unable to upload file when not connected.');
+        }
+
+        if (!file_exists($localPath)) {
+            throw new InvalidArgumentException('The local file does not exist.');
+        }
+
+        return ssh2_scp_send($this->resource, $localPath, $remotePath);
+    }
+
+    public function download(string $remotePath, string $localPath): bool
+    {
+        if (!$this->connected) {
+            throw new RuntimeException('Unable to download file when not connected.');
+        }
+
+        return ssh2_scp_recv($this->resource, $remotePath, $localPath);
     }
 }
