@@ -130,4 +130,9 @@ class SSHConnection
 
         return ssh2_scp_recv($this->resource, $remotePath, $localPath);
     }
+
+    public function isConnected(): bool
+    {
+        return $this->connected;
+    }
 }
