@@ -68,6 +68,10 @@ class SSHConnection
 
         $this->resource = ssh2_connect($this->hostname, $this->port);
 
+        if (!$this->resource) {
+            throw new RuntimeException('Error connecting to server.');
+        }
+
         if ($this->publicKeyPath || $this->privateKeyPath) {
             $authenticated = ssh2_auth_pubkey_file($this->resource, $this->username, $this->publicKeyPath, $this->privateKeyPath);
             if (!$authenticated) {
