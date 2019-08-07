@@ -13,7 +13,7 @@ class SSHConnection
     private $password;
     private $publicKeyPath;
     private $privateKeyPath;
-    private $connected;
+    private $connected = false;
     private $resource;
 
     public function to(string $hostname): self
