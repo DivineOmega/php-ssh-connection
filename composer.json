@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=7.1",
-        "ext-ssh2": "*"
+        "phpseclib/phpseclib": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.0||^8.0",

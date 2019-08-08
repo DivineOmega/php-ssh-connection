@@ -3,6 +3,9 @@
 namespace DivineOmega\SSHConnection;
 
 use InvalidArgumentException;
+use phpseclib\Crypt\RSA;
+use phpseclib\Net\SCP;
+use phpseclib\Net\SSH2;
 use RuntimeException;
 
 class SSHConnection
@@ -11,10 +14,9 @@ class SSHConnection
     private $port = 22;
     private $username;
     private $password;
-    private $publicKeyPath;
     private $privateKeyPath;
     private $connected = false;
-    private $resource;
+    private $ssh;
 
     public function to(string $hostname): self
     {
@@ -40,9 +42,8 @@ class SSHConnection
         return $this;
     }
 
-    public function withKeyPair(string $publicKeyPath, string $privateKeyPath): self
+    public function withPrivateKey(string $privateKeyPath): self
     {
-        $this->publicKeyPath = $publicKeyPath;
         $this->privateKeyPath = $privateKeyPath;
         return $this;
     }
@@ -57,8 +58,8 @@ class SSHConnection
             throw new InvalidArgumentException('Username not specified.');
         }
 
-        if (!$this->password && (!$this->publicKeyPath || !$this->privateKeyPath)) {
-            throw new InvalidArgumentException('No password or public-private key pair specified.');
+        if (!$this->password && (!$this->privateKeyPath)) {
+            throw new InvalidArgumentException('No password or private key path specified.');
         }
     }
 
@@ -66,21 +67,23 @@ class SSHConnection
     {
         $this->sanityCheck();
 
-        $this->resource = ssh2_connect($this->hostname, $this->port);
+        $this->ssh = new SSH2($this->hostname);
 
-        if (!$this->resource) {
+        if (!$this->ssh) {
             throw new RuntimeException('Error connecting to server.');
         }
 
-        if ($this->publicKeyPath || $this->privateKeyPath) {
-            $authenticated = ssh2_auth_pubkey_file($this->resource, $this->username, $this->publicKeyPath, $this->privateKeyPath);
+        if ($this->privateKeyPath) {
+            $key = new RSA();
+            $key->loadKey(file_get_contents($this->privateKeyPath));
+            $authenticated = $this->ssh->login($this->username, $key);
             if (!$authenticated) {
                 throw new RuntimeException('Error authenticating with public-private key pair.');
             }
         }
 
         if ($this->password) {
-            $authenticated = ssh2_auth_password($this->resource, $this->username, $this->password);
+            $authenticated = $this->ssh->login($this->username, $this->password);
             if (!$authenticated) {
                 throw new RuntimeException('Error authenticating with password.');
             }
@@ -97,7 +100,7 @@ class SSHConnection
             throw new RuntimeException('Unable to disconnect. Not yet connected.');
         }
 
-        ssh2_disconnect($this->resource);
+        $this->ssh->disconnect();
     }
 
     public function run(string $command): SSHCommand
@@ -106,7 +109,7 @@ class SSHConnection
             throw new RuntimeException('Unable to run commands when not connected.');
         }
 
-        return new SSHCommand($this->resource, $command);
+        return new SSHCommand($this->ssh, $command);
     }
 
     public function upload(string $localPath, string $remotePath): bool
@@ -119,7 +122,7 @@ class SSHConnection
             throw new InvalidArgumentException('The local file does not exist.');
         }
 
-        return ssh2_scp_send($this->resource, $localPath, $remotePath);
+        return (new SCP($this->ssh))->put($remotePath, $localPath, SCP::SOURCE_LOCAL_FILE);
     }
 
     public function download(string $remotePath, string $localPath): bool
@@ -128,7 +131,7 @@ class SSHConnection
             throw new RuntimeException('Unable to download file when not connected.');
         }
 
-        return ssh2_scp_recv($this->resource, $remotePath, $localPath);
+        return (new SCP($this->ssh))->get($remotePath, $localPath);
     }
 
     public function isConnected(): bool
