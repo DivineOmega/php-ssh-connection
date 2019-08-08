@@ -7,15 +7,7 @@ The PHP SSH Connection package provides an elegant syntax to connect to SSH serv
 
 ## Installation
 
-First, you may need to install the PHP SSH2 extension. In Ubuntu and other Debian-based systems, you can install this extension by running the following command.
-
-```bash
-sudo apt install php-ssh2
-```
-
-For other operating systems, see the [PHP SSH2 extension documentation](https://www.php.net/manual/en/book.ssh2.php).
-
-You can then run the following Composer command to install the PHP SSH Connection package.
+You can install the PHP SSH Connection package by running the following Composer command.
 
 ```bash
 composer require divineomega/php-ssh-connection
@@ -29,7 +21,7 @@ $connection = (new SSHConnection())
             ->onPort(22)
             ->as('demo')
             ->withPassword('password')
-         // ->withKeyPair($publicKeyPath, $privateKeyPath)
+         // ->withPrivateKey($privateKeyPath)
             ->connect();
 
 $command = $connection->run('echo "Hello world!"');
