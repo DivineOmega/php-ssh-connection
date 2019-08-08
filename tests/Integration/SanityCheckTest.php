@@ -12,7 +12,7 @@ final class SanityCheckTest extends TestCase
         (new SSHConnection())
             ->onPort(22)
             ->as('travis')
-            ->withKeyPair('/home/travis/.ssh/id_rsa.pub', '/home/travis/.ssh/id_rsa')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
             ->connect();
     }
 
@@ -23,7 +23,7 @@ final class SanityCheckTest extends TestCase
         (new SSHConnection())
             ->to('localhost')
             ->onPort(22)
-            ->withKeyPair('/home/travis/.ssh/id_rsa.pub', '/home/travis/.ssh/id_rsa')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
             ->connect();
     }
 

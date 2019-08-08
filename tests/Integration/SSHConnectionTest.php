@@ -11,7 +11,7 @@ final class SSHConnectionTest extends TestCase
             ->to('localhost')
             ->onPort(22)
             ->as('travis')
-            ->withKeyPair('/home/travis/.ssh/id_rsa.pub', '/home/travis/.ssh/id_rsa')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
             ->connect();
 
         $remotePath =  __DIR__ . '/../fixtures/upload.txt';
@@ -27,7 +27,7 @@ final class SSHConnectionTest extends TestCase
             ->to('localhost')
             ->onPort(22)
             ->as('travis')
-            ->withKeyPair('/home/travis/.ssh/id_rsa.pub', '/home/travis/.ssh/id_rsa')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
             ->connect();
 
         $remotePath =  __DIR__ . '/../fixtures/file.txt';
@@ -43,7 +43,7 @@ final class SSHConnectionTest extends TestCase
             ->to('localhost')
             ->onPort(22)
             ->as('travis')
-            ->withKeyPair('/home/travis/.ssh/id_rsa.pub', '/home/travis/.ssh/id_rsa')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
             ->connect();
 
         $command = $connection->run('echo "Hello world!"');
