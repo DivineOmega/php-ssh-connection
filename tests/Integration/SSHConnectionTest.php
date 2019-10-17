@@ -72,4 +72,42 @@ final class SSHConnectionTest extends TestCase
         $this->assertEquals('', $command->getError());
         $this->assertEquals('', $command->getRawError());
     }
+
+    public function testMd5Fingerprint()
+    {
+        $connection1 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $connection2 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $this->assertEquals($connection1->md5Fingerprint(), $connection2->md5Fingerprint());
+    }
+
+    public function testSha1Fingerprint()
+    {
+        $connection1 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $connection2 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $this->assertEquals($connection1->sha1Fingerprint(), $connection2->sha1Fingerprint());
+    }
 }

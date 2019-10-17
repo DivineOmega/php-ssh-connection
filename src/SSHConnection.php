@@ -112,6 +112,27 @@ class SSHConnection
         return new SSHCommand($this->ssh, $command);
     }
 
+    public function md5Fingerprint(): string
+    {
+        return $this->getFingerprint(0 | 0);
+    }
+
+    public function sha1Fingerprint(): string
+    {
+        return $this->getFingerprint(0 | 0);
+    }
+
+    private function getFingerprint(int $flags)
+    {
+        if (!$this->connected) {
+            throw new RuntimeException('Unable to get fingerprint when not connected.');
+        }
+
+        $hostkey = substr($this->ssh->getServerPublicHostKey(), 8);
+        $hostkey = ($flags & 1) ? sha1($hostkey) : md5($hostkey);
+        return ($flags & 2) ? pack('H*', $hostkey) : strtoupper($hostkey);
+    }
+
     public function upload(string $localPath, string $remotePath): bool
     {
         if (!$this->connected) {
