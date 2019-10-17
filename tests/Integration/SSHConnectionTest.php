@@ -72,4 +72,92 @@ final class SSHConnectionTest extends TestCase
         $this->assertEquals('', $command->getError());
         $this->assertEquals('', $command->getRawError());
     }
+
+    public function testMd5Fingerprint()
+    {
+        $connection1 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $connection2 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $this->assertEquals(
+            $connection1->fingerprint(SSHConnection::FINGERPRINT_MD5),
+            $connection2->fingerprint(SSHConnection::FINGERPRINT_MD5)
+        );
+    }
+
+    public function testSha1Fingerprint()
+    {
+        $connection1 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $connection2 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $this->assertEquals(
+            $connection1->fingerprint(SSHConnection::FINGERPRINT_SHA1),
+            $connection2->fingerprint(SSHConnection::FINGERPRINT_SHA1)
+        );
+    }
+
+    public function testMd5FingerprintFailure()
+    {
+        $connection1 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $connection2 = (new SSHConnection())
+            ->to('test.rebex.net')
+            ->onPort(22)
+            ->as('demo')
+            ->withPassword('password')
+            ->connect();
+
+        $this->assertNotEquals(
+            $connection1->fingerprint(SSHConnection::FINGERPRINT_MD5),
+            $connection2->fingerprint(SSHConnection::FINGERPRINT_MD5)
+        );
+    }
+
+    public function testSha1FingerprintFailure()
+    {
+        $connection1 = (new SSHConnection())
+            ->to('localhost')
+            ->onPort(22)
+            ->as('travis')
+            ->withPrivateKey('/home/travis/.ssh/id_rsa')
+            ->connect();
+
+        $connection2 = (new SSHConnection())
+            ->to('test.rebex.net')
+            ->onPort(22)
+            ->as('demo')
+            ->withPassword('password')
+            ->connect();
+
+        $this->assertNotEquals(
+            $connection1->fingerprint(SSHConnection::FINGERPRINT_SHA1),
+            $connection2->fingerprint(SSHConnection::FINGERPRINT_SHA1)
+        );
+    }
 }
