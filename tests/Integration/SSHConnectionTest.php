@@ -89,7 +89,10 @@ final class SSHConnectionTest extends TestCase
             ->withPrivateKey('/home/travis/.ssh/id_rsa')
             ->connect();
 
-        $this->assertEquals($connection1->md5Fingerprint(), $connection2->md5Fingerprint());
+        $this->assertEquals(
+            $connection1->fingerprint(SSHConnection::FINGERPRINT_MD5),
+            $connection2->fingerprint(SSHConnection::FINGERPRINT_MD5)
+        );
     }
 
     public function testSha1Fingerprint()
@@ -108,6 +111,9 @@ final class SSHConnectionTest extends TestCase
             ->withPrivateKey('/home/travis/.ssh/id_rsa')
             ->connect();
 
-        $this->assertEquals($connection1->sha1Fingerprint(), $connection2->sha1Fingerprint());
+        $this->assertEquals(
+            $connection1->fingerprint(SSHConnection::FINGERPRINT_SHA1),
+            $connection2->fingerprint(SSHConnection::FINGERPRINT_SHA1)
+        );
     }
 }

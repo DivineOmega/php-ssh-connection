@@ -10,6 +10,9 @@ use RuntimeException;
 
 class SSHConnection
 {
+    const FINGERPRINT_MD5 = 'md5';
+    const FINGERPRINT_SHA1 = 'sha1';
+
     private $hostname;
     private $port = 22;
     private $username;
@@ -112,25 +115,21 @@ class SSHConnection
         return new SSHCommand($this->ssh, $command);
     }
 
-    public function md5Fingerprint(): string
-    {
-        return $this->getFingerprint(0 | 0);
-    }
-
-    public function sha1Fingerprint(): string
-    {
-        return $this->getFingerprint(0 | 0);
-    }
-
-    private function getFingerprint(int $flags)
+    public function fingerprint(string $type = self::FINGERPRINT_MD5)
     {
         if (!$this->connected) {
             throw new RuntimeException('Unable to get fingerprint when not connected.');
         }
 
-        $hostkey = substr($this->ssh->getServerPublicHostKey(), 8);
-        $hostkey = ($flags & 1) ? sha1($hostkey) : md5($hostkey);
-        return ($flags & 2) ? pack('H*', $hostkey) : strtoupper($hostkey);
+        switch ($type) {
+            case 'md5':
+                return strtoupper(md5($hostKey));
+
+            case 'sha1':
+                return strtoupper(sha1($hostKey));
+        }
+
+        throw new InvalidArgumentException('Invalid fingerprint type specified.');
     }
 
     public function upload(string $localPath, string $remotePath): bool
