@@ -15,6 +15,8 @@ composer require divineomega/php-ssh-connection
 
 ## Usage
 
+See the following basic usage instructions.
+
 ```php
 $connection = (new SSHConnection())
             ->to('test.rebex.net')
@@ -31,4 +33,15 @@ $command->getError();   // ''
 
 $connection->upload($localPath, $remotePath);
 $connection->download($remotePath, $localPath);
+```
+
+For security, you can fingerprint the remote server and verify the fingerprint remain the same 
+upon each subsequent connection.
+
+```php
+$fingerprint = $connection->fingerprint();
+
+if ($newConnection->fingerprint() != $fingerprint) {
+    throw new Exception('Fingerprint does not match!');
+}
 ```
