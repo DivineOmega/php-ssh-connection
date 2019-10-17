@@ -121,6 +121,8 @@ class SSHConnection
             throw new RuntimeException('Unable to get fingerprint when not connected.');
         }
 
+        $hostKey = substr($this->ssh->getServerPublicHostKey(), 8);
+
         switch ($type) {
             case 'md5':
                 return strtoupper(md5($hostKey));
