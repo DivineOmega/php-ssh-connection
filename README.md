@@ -35,7 +35,7 @@ $connection->upload($localPath, $remotePath);
 $connection->download($remotePath, $localPath);
 ```
 
-For security, you can fingerprint the remote server and verify the fingerprint remain the same 
+For security, you can fingerprint the remote server and verify the fingerprint remains the same 
 upon each subsequent connection.
 
 ```php
