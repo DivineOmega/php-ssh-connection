@@ -70,7 +70,7 @@ class SSHConnection
     {
         $this->sanityCheck();
 
-        $this->ssh = new SSH2($this->hostname);
+        $this->ssh = new SSH2($this->hostname, $this->port);
 
         if (!$this->ssh) {
             throw new RuntimeException('Error connecting to server.');
