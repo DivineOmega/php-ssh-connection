@@ -18,6 +18,7 @@ class SSHConnection
     private $username;
     private $password;
     private $privateKeyPath;
+    private $timeout;
     private $connected = false;
     private $ssh;
 
@@ -48,6 +49,12 @@ class SSHConnection
     public function withPrivateKey(string $privateKeyPath): self
     {
         $this->privateKeyPath = $privateKeyPath;
+        return $this;
+    }
+
+    public function timeout(int $timeout): self
+    {
+        $this->timeout = $timeout;
         return $this;
     }
 
@@ -90,6 +97,10 @@ class SSHConnection
             if (!$authenticated) {
                 throw new RuntimeException('Error authenticating with password.');
             }
+        }
+
+        if ($this->timeout) {
+            $this->ssh->setTimeout($this->timeout);
         }
 
         $this->connected = true;

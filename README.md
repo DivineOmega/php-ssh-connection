@@ -24,6 +24,7 @@ $connection = (new SSHConnection())
             ->as('demo')
             ->withPassword('password')
          // ->withPrivateKey($privateKeyPath)
+         // ->timeout(0)
             ->connect();
 
 $command = $connection->run('echo "Hello world!"');
