@@ -1,5 +1,5 @@
 {
-    "name": "divineomega/php-ssh-connection",
+    "name": "brainstormforce/php-ssh-connection",
     "description": "Provides an elegant syntax to connect to SSH servers and execute commands.",
     "type": "library",
     "license": "LGPL-3.0-only",
